@@ -1,2 +1,3 @@
 # movie-api
-Simple API with Node.js
+
+Simple API with Node.js and Express
