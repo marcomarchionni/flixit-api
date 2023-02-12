@@ -11,12 +11,12 @@
       crossorigin="anonymous"
     />
   </head>
-  <body>
+  <body class="bg-light">
     <div class="container">
       <div class="row justify-content-center m-4">
-        <div class="col-md-9 m-4 p-4 bg-light">
-          <h1 class="mt-4 p-2 text-center">Spaghetti Western API</h1>
-          <h3 class="p-2 text-center">Documentation</h3>
+        <div class="col m-4 p-4 bg-white">
+          <h1 class="mt-4 text-center fw-bold">Spaghetti Western API</h1>
+          <h3 class="text-center">Documentation</h3>
           <div class="p-4">
             <p>
               This web application provides users with access to information
@@ -26,19 +26,194 @@
             </p>
             <br />
             <h3 class="py-4">Available Endpoints</h3>
-            <table>
-              <tr>
-                <th class="p-2">GET '/'</th>
-                <td class="p-2">Welcome message</td>
-              </tr>
-              <tr>
-                <th class="p-2">GET '/movies'</th>
-                <td class="p-2">Movies data in JSON format</td>
-              </tr>
-              <tr>
-                <th class="p-2">GET '/documentation.html'</th>
-                <td class="p-2">Spaghetti Western API documentation</td>
-              </tr>
+            <table class="table table-striped-columns">
+              <thead class="table-dark">
+                <tr>
+                  <th>Description</th>
+                  <th>HTTP method</th>
+                  <th>Request URL</th>
+                  <th>Request Body Data Format</th>
+                  <th>Response Body Data Format</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Get a list of all movies</td>
+                  <td class="text-danger fw-bold">GET</td>
+                  <td><code>/movies</code></td>
+                  <td>None</td>
+                  <td>A JSON object holding data of all movies.</td>
+                </tr>
+                <tr>
+                  <td>Get a movie data by title</td>
+                  <td class="text-danger fw-bold">GET</td>
+                  <td>
+                    <code>/movies/[title]</code>
+                  </td>
+                  <td>None</td>
+                  <td>
+                    A JSON object holding data of single movie. Es.
+                    <code>
+                      <pre class="mt-2">
+  {
+    "title": "My Name Is Nobody",
+    "director": "Tonino Valerii",
+    "writers":[
+      "Sergio Leone",
+      "Fulvio Morsella",
+      "Ernesto Gastaldi"
+      ],
+    "stars": [
+      "Terence Hill",
+      "Henry Fonda",
+      "Jean Martin"
+      ],
+    "year": 1973,
+  }
+                      </pre>
+                    </code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Get a list of movies by director</td>
+                  <td class="text-danger fw-bold">GET</td>
+                  <td><code>/movies/directors/[director]</code></td>
+                  <td>None</td>
+                  <td>
+                    A JSON object holding data of all movies of a specific
+                    director.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Get a director data by name</td>
+                  <td class="text-danger fw-bold">GET</td>
+                  <td><code>/directors/[name]</code></td>
+                  <td>None</td>
+                  <td>
+                    A JSON object holding data of a specific director. Es.
+                    <code>
+                      <pre class="mt-2">
+  {
+    "name": "Sergio Leone",
+    "born": 1929,
+    "died": 1989,
+    "bio": "The father of the Spaghetti Western."
+  }
+                      </pre>
+                    </code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Register a new user</td>
+                  <td class="text-danger fw-bold">POST</td>
+                  <td><code>/users</code></td>
+                  <td>
+                    A JSON object holding a user's info. Es.
+                    <code>
+                      <pre class="mt-2">
+  {
+    "name": "Mario Rossi",
+    "email": "mario.rossi@xyz.com"
+  }
+                      </pre>
+                    </code>
+                  </td>
+                  <td>
+                    A JSON object holding data of the new user. Es.
+                    <code>
+                      <pre class="mt-2">
+  {
+    "id": 1,
+    "name": "Mario Rossi",
+    "email": "mario.rossi@xyz.com"
+  }
+                      </pre>
+                    </code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Update a user name</td>
+                  <td class="text-danger fw-bold">PUT</td>
+                  <td><code>/users/[id]/[name]</code></td>
+                  <td>None</td>
+                  <td>
+                    A JSON object holding data of the updated user. Es.
+                    <code>
+                      <pre class="mt-2">
+  {
+    "id": 1,
+    "name": "Mario Rossi",
+    "email": "mario.rossi@xyz.com"
+  }
+                      </pre>
+                    </code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Add movie to user's list of favorites</td>
+                  <td class="text-danger fw-bold">PUT</td>
+                  <td><code>/users/[id]/movies/[movieId]</code></td>
+                  <td>None</td>
+                  <td>
+                    A JSON object holding data of the updated user. Es.
+                    <code>
+                      <pre class="mt-2">
+  {
+    "id": 1,
+    "name": "Mario Rossi",
+    "email": "mario.rossi@xyz.com"
+    "movies": [
+      {
+        "title": "My Name Is Nobody",
+        "director": "Tonino Valerii",
+        "writers":[
+          "Sergio Leone",
+          "Fulvio Morsella",
+          "Ernesto Gastaldi"
+        ],
+        "stars": [
+          "Terence Hill",
+          "Henry Fonda",
+          "Jean Martin"
+          ],
+        "year": 1973,
+      }
+    ]
+  }
+                      </pre>
+                    </code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Remove movie from user's list of favorites</td>
+                  <td class="text-danger fw-bold">DELETE</td>
+                  <td><code>/users/[id]/movies/[movieId]</code></td>
+                  <td>None</td>
+                  <td>
+                    A JSON object holding data of the updated user. Es.
+                    <code>
+                      <pre class="mt-2">
+  {
+    "id": 1,
+    "name": "Mario Rossi",
+    "email": "mario.rossi@xyz.com"
+    "movies": []
+  }
+                      </pre>
+                    </code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Delete user by email</td>
+                  <td class="text-danger fw-bold">DELETE</td>
+                  <td><code>/users/[email]</code></td>
+                  <td>None</td>
+                  <td>
+                    A text response confirming that the user with email [email]
+                    has been removed.
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
