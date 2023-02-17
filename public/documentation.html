@@ -38,6 +38,30 @@
               </thead>
               <tbody>
                 <tr>
+                  <td>Get a list of all genres</td>
+                  <td class="text-danger fw-bold">GET</td>
+                  <td><code>/genres</code></td>
+                  <td>None</td>
+                  <td>
+                    A JSON object holding a cleection of all available genres.
+                    Es.
+                    <code>
+                      <pre class="mt-2">
+  [
+    {
+      "name": "Spaghetti Western",
+      "description": "...",
+    },
+    {
+      "name": "Historical Drama",
+      "description": "..."
+    }
+  ]
+                      </pre>
+                    </code>
+                  </td>
+                </tr>
+                <tr>
                   <td>Get a list of all movies</td>
                   <td class="text-danger fw-bold">GET</td>
                   <td><code>/movies</code></td>
@@ -56,31 +80,48 @@
                     <code>
                       <pre class="mt-2">
   {
-    "title": "My Name Is Nobody",
-    "director": "Tonino Valerii",
-    "writers":[
-      "Sergio Leone",
-      "Fulvio Morsella",
-      "Ernesto Gastaldi"
-      ],
+    "title": "A Fistful of Dollars",
+    "director": {
+      "name": "Sergio Leone",
+      "born": "1929-01-03",
+      "died": "1989-04-30",
+      "bio": "..."
+    },
     "stars": [
-      "Terence Hill",
-      "Henry Fonda",
-      "Jean Martin"
-      ],
-    "year": 1973,
+      {
+        "name": "Clint Eastwood",
+        "born": "1930-05-31",
+        "bio": "..."
+      },
+      {
+        ...
+      }
+    ],
+    "releaseYear": "1964"
   }
                       </pre>
                     </code>
                   </td>
                 </tr>
                 <tr>
-                  <td>Get a list of movies by director</td>
+                  <td>Get a list of movies by genre</td>
                   <td class="text-danger fw-bold">GET</td>
-                  <td><code>/movies/directors/[director]</code></td>
+                  <td>
+                    <code>/movies/[genreName]</code>
+                  </td>
                   <td>None</td>
                   <td>
-                    A JSON object holding data of all movies of a specific
+                    A JSON object holding a collection of movies with the same
+                    genre.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Get a list of movies by director</td>
+                  <td class="text-danger fw-bold">GET</td>
+                  <td><code>/movies/[directorName]</code></td>
+                  <td>None</td>
+                  <td>
+                    A JSON object holding a collection of movies from the same
                     director.
                   </td>
                 </tr>
@@ -112,8 +153,9 @@
                     <code>
                       <pre class="mt-2">
   {
-    "name": "Mario Rossi",
+    "username": "Mario Rossi",
     "email": "mario.rossi@xyz.com"
+    "password": "1234"
   }
                       </pre>
                     </code>
@@ -124,7 +166,7 @@
                       <pre class="mt-2">
   {
     "id": 1,
-    "name": "Mario Rossi",
+    "username": "Mario Rossi",
     "email": "mario.rossi@xyz.com"
   }
                       </pre>
@@ -132,9 +174,9 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>Update a user name</td>
+                  <td>Update a user username</td>
                   <td class="text-danger fw-bold">PUT</td>
-                  <td><code>/users/[id]/[name]</code></td>
+                  <td><code>/users/[id]/[username]</code></td>
                   <td>None</td>
                   <td>
                     A JSON object holding data of the updated user. Es.
@@ -142,7 +184,7 @@
                       <pre class="mt-2">
   {
     "id": 1,
-    "name": "Mario Rossi",
+    "username": "Rossi",
     "email": "mario.rossi@xyz.com"
   }
                       </pre>
@@ -152,7 +194,7 @@
                 <tr>
                   <td>Add movie to user's list of favorites</td>
                   <td class="text-danger fw-bold">PUT</td>
-                  <td><code>/users/[id]/movies/[movieId]</code></td>
+                  <td><code>/users/[userId]/movies/[movieId]</code></td>
                   <td>None</td>
                   <td>
                     A JSON object holding data of the updated user. Es.
@@ -164,6 +206,7 @@
     "email": "mario.rossi@xyz.com"
     "movies": [
       {
+        "id": 1
         "title": "My Name Is Nobody",
         "director": "Tonino Valerii",
         "writers":[
@@ -187,7 +230,7 @@
                 <tr>
                   <td>Remove movie from user's list of favorites</td>
                   <td class="text-danger fw-bold">DELETE</td>
-                  <td><code>/users/[id]/movies/[movieId]</code></td>
+                  <td><code>/users/[userId]/movies/[movieId]</code></td>
                   <td>None</td>
                   <td>
                     A JSON object holding data of the updated user. Es.
@@ -209,8 +252,8 @@
                   <td><code>/users/[email]</code></td>
                   <td>None</td>
                   <td>
-                    A text response confirming that the user with email [email]
-                    has been removed.
+                    A text response confirming that the user with the specified
+                    email has been removed.
                   </td>
                 </tr>
               </tbody>
