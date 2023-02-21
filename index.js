@@ -1,137 +1,46 @@
 const express = require('express'),
   morgan = require('morgan'),
-  uuid = require('uuid');
-bodyParser = require('body-parser');
+  uuid = require('uuid'),
+  bodyParser = require('body-parser'),
+  mongoose = require('mongoose'),
+  Models = require('./models.js'),
+  response = require('./responses.js');
+
+const Movies = Models.Movie;
+const Users = Models.User;
+
+mongoose.set('strictQuery', false);
+mongoose.connect('mongodb://127.0.0.1:27017/flixdb', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 const app = express();
-const movies = [
-  {
-    id: 1,
-    title: 'My Name Is Nobody',
-    director: 'Tonino Valerii',
-    writers: ['Sergio Leone', 'Fulvio Morsella', 'Ernesto Gastaldi'],
-    stars: ['Terence Hill', 'Henry Fonda', 'Jean Martin'],
-    year: 1973,
-  },
-  {
-    id: 2,
-    title: 'Django',
-    director: 'Sergio Corbucci',
-    writers: ['Sergio Corbucci', 'Bruno Corbucci', 'Franco Rossetti'],
-    stars: ['Franco Nero', 'José Canalejas', 'José Bódalo'],
-    year: 1966,
-  },
-  {
-    id: 3,
-    title: 'A Fistful of Dollars',
-    director: 'Sergio Leone',
-    writers: ['Andrea Bolzoni', 'Mark Lowell', 'Víctor Andrés Catena'],
-    stars: ['Clint Eastwood', 'Gian Maria Volontè', 'Marianne Koch'],
-    year: 1964,
-  },
-  {
-    id: 4,
-    title: 'Vengeance Is a Dish Served Cold',
-    director: 'Pasquale Squitieri',
-    writers: ['Pasquale Squitieri', 'Monica Venturini'],
-    stars: ['Leonard Mann', 'Ivan Rassimov', 'Elizabeth Eversfield'],
-    year: 1971,
-  },
-  {
-    id: 5,
-    title: 'A Pistol for Ringo',
-    director: 'Duccio Tessari',
-    writers: ['Duccio Tessari', 'Alfonso Balcázar', "Enzo Dell'Aquila"],
-    stars: ['Giuliano Gemma', 'Fernando Sancho', 'Lorella De Luca'],
-    year: 1965,
-  },
-  {
-    id: 6,
-    title: 'The Good, the Bad and the Ugly',
-    director: 'Sergio Leone',
-    writers: ['Sergio Leone', 'Luciano Vincenzoni', 'Agenore Incrocci'],
-    stars: ['Clint Eastwood', 'Eli Wallach', 'Lee Van Cleef'],
-    year: 1966,
-  },
-  {
-    id: 7,
-    title: 'They Call Me Trinity',
-    director: 'Enzo Barboni',
-    writers: ['Enzo Barboni', 'Gene Luotto'],
-    stars: ['Terence Hill', 'Bud Spencer', 'Steffen Zacharias'],
-    year: 1970,
-  },
-  {
-    id: 8,
-    title: 'For a Few Dollars More',
-    director: 'Sergio Leone',
-    writers: ['Sergio Leone', 'Fulvio Morsella', 'Luciano Vincenzoni'],
-    stars: ['Clint Eastwood', 'Lee Van Cleef', 'Gian Maria Volontè'],
-    year: 1965,
-  },
-  {
-    id: 9,
-    title: 'Once Upon a Time in the West',
-    director: 'Sergio Leone',
-    writers: ['Sergio Leone', 'Sergio Donati', 'Dario Argento'],
-    stars: ['Henry Fonda', 'Charles Bronson', 'Claudia Cardinale'],
-    year: 1968,
-  },
-  {
-    id: 10,
-    title: 'The Big Gundown',
-    director: 'Sergio Sollima',
-    writers: ['Franco Solinas', 'Fernando Morandi', 'Sergio Donati'],
-    stars: ['Lee Van Cleef', 'Tomas Milian', 'Walter Barnes'],
-    year: 1967,
-  },
-];
-const directors = [
-  {
-    name: 'Sergio Leone',
-    born: 1929,
-    died: 1989,
-    bio: 'The father of the Spaghetti Western',
-  },
-  {
-    name: 'Sergio Corbucci',
-    born: 1926,
-    died: 1990,
-    bio: 'The other Sergio',
-  },
-  {
-    name: 'Sergio Sollima',
-    born: 1921,
-    died: 2015,
-    bio: 'Although best known as a director of a few Spaghetti Westerns, Sollima excelled at a number of different genres.',
-  },
-  {
-    name: 'Pasquale Squitieri',
-    born: 1938,
-    died: 2017,
-    bio: '',
-  },
-];
-const users = [
-  {
-    id: 1,
-    name: 'Marco Marchionni',
-    email: 'marco.marchionni@gmail.com',
-  },
-];
 
-findUserById = function (id) {
-  return users.find((user) => user.id == id);
-};
-findUserByEmail = function (email) {
-  return users.find((user) => user.email == email);
-};
-findMovieById = function (id) {
-  return movies.find((movie) => movie.id == id);
-};
-findDirectorById = function (id) {
-  return directors.find((movie) => movie.id == id);
-};
+// helper methods
+function isEmpty(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) return true;
+  return false;
+}
 
+// validation
+function userIsValid(user) {
+  userNotNull = user !== null;
+  usernameNotNull = user.username !== null;
+  emailNotNull = user.email !== null;
+  return userNotNull && usernameNotNull && emailNotNull;
+}
+
+function userUpdateIsValid(update) {
+  const updateNotNull = update !== null;
+  const atLeastOneFieldNotNull =
+    update.username || update.email || update.password || update.birthday;
+  const editableKeys = ['username', 'email', 'password', 'birthday'];
+  const validKeys = Object.keys(update).every((k) => editableKeys.includes(k));
+  return updateNotNull && atLeastOneFieldNotNull && validKeys;
+}
+
+// init middleware
 app.use(morgan('common'));
 app.use(bodyParser.json());
 
@@ -143,161 +52,205 @@ app.get('/', (req, res) => {
   res.redirect('/documentation.html');
 });
 
-// GET list of ALL movies
+// GET list of all movies
 app.get('/movies', (req, res) => {
-  res.json(movies);
+  Movies.find()
+    .then((movies) => response.success(res, movies))
+    .catch((err) => response.serverError(res, err));
 });
 
 // GET a movie by title
 app.get('/movies/:title', (req, res) => {
   const title = req.params.title;
-  const movie = movies.find((movie) => movie.title === title);
-  if (movie) {
-    res.json(movie);
-  } else {
-    res.status(404).send(`Movie with title: ${title} not found`);
-  }
+  Movies.findOne({ title: title })
+    .then((movieFound) => {
+      if (!movieFound) {
+        response.noMovieWithTitle(res, title);
+      } else {
+        response.success(res, movieFound);
+      }
+    })
+    .catch((err) => response.serverError(res, err));
 });
 
 // GET movies by director
 app.get('/movies/directors/:director', (req, res) => {
-  const director = req.params.director;
-  const moviesByDirector = movies.filter(
-    (movie) => movie.director === director
-  );
-  if (moviesByDirector.length > 0) {
-    res.json(moviesByDirector);
-  } else {
-    res.status(404).send(`No movies from ${director} were found`);
-  }
+  const directorName = req.params.director;
+  Movies.find({ 'director.name': directorName })
+    .then((movies) => {
+      if (isEmpty(movies)) {
+        response.noMoviesWithDirector(res, directorName);
+      } else {
+        response.success(res, movies);
+      }
+    })
+    .catch((err) => response.serverError(res, err));
+});
+
+// GET movies by genre
+app.get('/movies/genres/:genreName', (req, res) => {
+  const genreName = req.params.genreName;
+  Movies.find({ 'genre.name': genreName })
+    .then((movies) => {
+      if (isEmpty(movies)) {
+        response.noMoviesWithGenre(res, genreName);
+      } else {
+        response.success(res, movies);
+      }
+    })
+    .catch((err) => response.serverError(res, err));
+});
+
+// GET genre by name
+app.get('/genres/:genreName', (req, res) => {
+  const genreName = req.params.genreName;
+  Movies.findOne({ 'genre.name': genreName }, { genre: 1 })
+    .then((result) => {
+      console.log(result);
+      if (result) {
+        response.success(res, result.genre);
+      } else {
+        response.noGenreWithName(res, genreName);
+      }
+    })
+    .catch((err) => response.serverError(res, err));
 });
 
 // GET director by name
-app.get('/directors/:name', (req, res) => {
-  const name = req.params.name;
-  const director = directors.find((director) => director.name === name);
-  if (director) {
-    res.json(director);
-  } else {
-    res.status(404).send(`No director with name: ${name} was found`);
-  }
+app.get('/directors/:directorName', (req, res) => {
+  const directorName = req.params.directorName;
+  Movies.findOne({ 'director.name': directorName })
+    .then((result) => {
+      if (result) {
+        response.success(res, result.director);
+      } else {
+        response.noDirectorWithName(res, directorName);
+      }
+    })
+    .catch((err) => response.serverError(res, err));
 });
 
 // CREATE new user
 app.post('/users', (req, res) => {
-  let user = req.body;
-  if (user && user.email) {
-    const emailIsNotTaken =
-      users.find((u) => u.email === user.email) === undefined;
+  const user = req.body;
 
-    if (emailIsNotTaken) {
-      //add user to repo
-      user.id = uuid.v4();
-      users.push(user);
-      res.json(user);
-    } else {
-      res.status(400).send(`Invalid user email`);
-    }
+  if (!userIsValid(user)) {
+    response.invalidData(res);
   } else {
-    res.status(400).send(`Empty user data`);
+    // check if username and email are already taken
+    Users.findOne({ $or: [{ email: user.email }, { username: user.username }] })
+      .then((result) => {
+        if (result && result.email === user.email) {
+          return response.alreadyUserWithEmail(res, user.email);
+        }
+        if (result && result.email === user.username) {
+          return response.alreadyUserWithUsername(res, user.username);
+        }
+        // username and email not in db, so create new user
+        return Users.create({
+          username: user.username,
+          email: user.email,
+          password: user.password,
+          birthday: user.birthday,
+        }).then((createdUser) => response.created(res, createdUser));
+      })
+      .catch((err) => response.serverError(res, err));
   }
 });
 
-// UPDATE user name
-app.put('/users/:id/:name', (req, res) => {
-  const id = req.params.id;
-  console.log(users);
-  console.log(id);
-  let user = findUserById(id);
-  if (user) {
-    user.name = req.params.name;
-    res.json(user);
-  } else {
-    res.status(404).send(`User with id: ${id} not found`);
+// UPDATE user info
+app.put('/users/:username', (req, res) => {
+  // validate request data
+  const userUpdate = req.body;
+  if (!userUpdateIsValid(userUpdate)) {
+    return response.invalidData(res, userUpdate);
   }
+  // valid data, update db
+  Users.findOneAndUpdate(
+    { username: req.params.username },
+    { $set: userUpdate },
+    { new: true }
+  )
+    .then((userUpdated) => {
+      if (!userUpdated) {
+        return response.noUserWithUsername(req.params.username);
+      } else {
+        return response.success(res, userUpdated);
+      }
+    })
+    .catch((err) => response.serverError(res, err));
 });
 
-// Add movie to user list of favourites
-app.put('/users/:userId/movies/:movieId', (req, res) => {
-  const userId = req.params.userId;
+// ADD movie to user list of favourites
+app.put('/users/:username/movies/:movieId', (req, res) => {
+  const username = req.params.username;
   const movieId = req.params.movieId;
-  // check if user and movie are valid
-  let user = findUserById(userId);
-  if (!user) {
-    res.status(404).send(`User with id: ${userId} not found`);
-    return;
-  }
-  let movie = findMovieById(movieId);
-  if (!movie) {
-    res.status(404).send(`Movie with id: ${movieId} not found`);
-    return;
-  }
-  // init movie list
-  if (!user.movies) {
-    user.movies = [];
-  } else {
-    // check if movie is already in the user's list of favorites
-    if (user.movies.includes(movie)) {
-      res
-        .status(400)
-        .send(
-          `Movie with id: ${movieId} is already a favourite for user with id: ${userId}`
-        );
-      return;
-    }
-  }
-  user.movies.push(movie);
-  res.json(user);
+  // check if movieId is valid
+  Movies.findById(movieId)
+    .then((movieFound) => {
+      if (!movieFound) {
+        return response.noMovieWithMovieId(res, movieId);
+      } else {
+        // update user with movieId
+        return Users.findOneAndUpdate(
+          { username: username },
+          { $addToSet: { favouriteMovies: movieId } },
+          { new: true }
+        ).then((updatedUser) => {
+          if (!updatedUser) {
+            response.noUserWithUsername(res, username);
+          } else {
+            response.success(res, updatedUser);
+          }
+        });
+      }
+    })
+    .catch((err) => response.serverError(res, err));
 });
 
-// Delete movie from list of favourites
-app.delete('/users/:userId/movies/:movieId', (req, res) => {
-  const userId = req.params.userId;
+// DELETE movie from list of favourites
+app.delete('/users/:username/movies/:movieId', (req, res) => {
+  const username = req.params.username;
   const movieId = req.params.movieId;
-  let user = findUserById(userId);
-  console.log(user);
-  if (!user) {
-    res.status(404).send(`User with id: ${userId} not found`);
-    return;
-  }
-  let movie = findMovieById(movieId);
-  if (!movie) {
-    res.status(404).send(`Movie with id: ${movieId} not found`);
-    return;
-  }
-  if (!user.movies || !user.movies.includes(movie)) {
-    res
-      .status(404)
-      .send(`Movie with id: ${movieId} is not in user's list of favourites`);
-  } else {
-    user.movies.splice(
-      user.movies.findIndex((m) => m === movie),
-      1
-    );
-    res.json(user);
-  }
+  //check if movieId is valid
+  Movies.findById(movieId)
+    .then((movieFound) => {
+      if (!movieFound) {
+        return response.noMovieWithMovieId(res, movieId);
+      } else {
+        return Users.findOneAndUpdate(
+          { username: username },
+          { $pull: { favouriteMovies: movieId } },
+          { new: true }
+        ).then((updatedUser) => {
+          if (!updatedUser) {
+            response.noUserWithUsername(res, username);
+          } else {
+            response.success(res, updatedUser);
+          }
+        });
+      }
+    })
+    .catch((err) => response.serverError(res, err));
 });
 
-// DELETE user by email
-app.delete('/users/:email', (req, res) => {
-  const email = req.params.email;
-  const user = findUserByEmail(email);
-  if (!user) {
-    res.status(404).send(`User with email: ${email} not found`);
-  } else {
-    users.splice(
-      users.findIndex((u) => u === user),
-      1
-    );
-    console.log(users);
-    res.send(`User with email: ${email} removed`);
-  }
+// DELETE user by username
+app.delete('/users/:username', (req, res) => {
+  const username = req.params.username;
+  Users.findOneAndDelete({ username: username })
+    .then((deletedUser) => {
+      if (!deletedUser) {
+        return response.noUserWithUsername(res, username);
+      } else {
+        return response.success(res, deletedUser);
+      }
+    })
+    .catch((err) => response.serverError(res, err));
 });
 
 // Error Handling
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('An error occurred');
+  response.serverError(res, err);
 });
 
 // Listen for requests
