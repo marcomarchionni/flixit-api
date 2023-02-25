@@ -3,30 +3,18 @@ const express = require('express'),
   bodyParser = require('body-parser'),
   cors = require('cors'),
   mongoose = require('mongoose'),
-  passport = require('passport'),
-  Models = require('./models'),
-  response = require('./responses.js'),
-  userController = require('./controllers/user.js'),
-  userValidation = require('./validation/user');
+  response = require('./src/responses/responses.js'),
+  routes = require('./src/routes/routes');
 
-const Movies = Models.Movie;
-const Users = Models.User;
+const app = express();
 
+// Database connection
 mongoose.set('strictQuery', false);
 mongoose.connect('mongodb://127.0.0.1:27017/flixdb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-const app = express();
-
-// helper methods
-function isEmpty(arr) {
-  if (!Array.isArray(arr) || arr.length === 0) return true;
-  return false;
-}
-
-/* Middleware */
 // Logging
 app.use(morgan('common'));
 
@@ -50,154 +38,11 @@ app.use(
   })
 );
 
-require('./auth.js')(app);
-require('./passport');
-
 // Static Requests
-app.use(express.static('public'));
+app.use(express.static('src/public'));
 
-// ROOT request
-app.get('/', (req, res) => {
-  res.redirect('/documentation.html');
-});
-
-// GET list of all movies
-app.get(
-  '/movies',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    Movies.find()
-      .then((movies) => response.success(res, movies))
-      .catch((err) => response.serverError(res, err));
-  }
-);
-
-// GET a movie by title
-app.get(
-  '/movies/:title',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    const title = req.params.title;
-    Movies.findOne({ title: title })
-      .then((movieFound) => {
-        if (!movieFound) {
-          response.noMovieWithTitle(res, title);
-        } else {
-          response.success(res, movieFound);
-        }
-      })
-      .catch((err) => response.serverError(res, err));
-  }
-);
-
-// GET movies by director
-app.get(
-  '/movies/directors/:director',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    const directorName = req.params.director;
-    Movies.find({ 'director.name': directorName })
-      .then((movies) => {
-        if (isEmpty(movies)) {
-          response.noMoviesWithDirector(res, directorName);
-        } else {
-          response.success(res, movies);
-        }
-      })
-      .catch((err) => response.serverError(res, err));
-  }
-);
-
-// GET movies by genre
-app.get(
-  '/movies/genres/:genreName',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    const genreName = req.params.genreName;
-    Movies.find({ 'genre.name': genreName })
-      .then((movies) => {
-        if (isEmpty(movies)) {
-          response.noMoviesWithGenre(res, genreName);
-        } else {
-          response.success(res, movies);
-        }
-      })
-      .catch((err) => response.serverError(res, err));
-  }
-);
-
-// GET genre by name
-app.get(
-  '/genres/:genreName',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    const genreName = req.params.genreName;
-    Movies.findOne({ 'genre.name': genreName }, { genre: 1 })
-      .then((result) => {
-        console.log(result);
-        if (result) {
-          response.success(res, result.genre);
-        } else {
-          response.noGenreWithName(res, genreName);
-        }
-      })
-      .catch((err) => response.serverError(res, err));
-  }
-);
-
-// GET director by name
-app.get(
-  '/directors/:directorName',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    const directorName = req.params.directorName;
-    Movies.findOne({ 'director.name': directorName })
-      .then((result) => {
-        if (result) {
-          response.success(res, result.director);
-        } else {
-          response.noDirectorWithName(res, directorName);
-        }
-      })
-      .catch((err) => response.serverError(res, err));
-  }
-);
-
-// CREATE new user
-app.post(
-  '/users',
-  userValidation.validateCreateUserData,
-  userController.createUser
-);
-
-// UPDATE user info
-app.put(
-  '/users/:username',
-  passport.authenticate('jwt', { session: false }),
-  userValidation.validateUpdateUserData,
-  userController.updateUser
-);
-
-// ADD movie to user list of favourites
-app.put(
-  '/users/:username/movies/:movieId',
-  passport.authenticate('jwt', { session: false }),
-  userController.addMovie
-);
-
-// DELETE movie from list of favourites
-app.delete(
-  '/users/:username/movies/:movieId',
-  passport.authenticate('jwt', { session: false }),
-  userController.removeMovie
-);
-
-// DELETE user by username
-app.delete(
-  '/users/:username',
-  passport.authenticate('jwt', { session: false }),
-  userController.deleteUser
-);
+// API requests
+app.use('/', routes);
 
 // Error Handling
 app.use((err, req, res, next) => {
@@ -205,6 +50,6 @@ app.use((err, req, res, next) => {
 });
 
 // Listen for requests
-app.listen(8080, () => {
-  console.log('Movie App is listening on port 8080.');
+app.listen(process.env.PORT, () => {
+  console.log(`Movie App is listening on port ${process.env.PORT}.`);
 });

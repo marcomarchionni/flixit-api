@@ -1,16 +1,13 @@
-const { matchedData } = require('express-validator');
-const { User: Users, Movie: Movies } = require('../models');
-const response = require('../responses');
+const { Users, Movies } = require('../models/models');
+const response = require('../responses/responses');
 const userValidation = require('../validation/user');
 
 exports.createUser = async (req, res) => {
   // handle validation errors
-  userValidation.handleValidation(req);
+  userValidation.handleResults(req, res);
 
   const createUserObject = {};
-  const { username, password, email, birthday } = matchedData(req, {
-    includeOptional: false,
-  });
+  const { username, password, email, birthday } = req.body;
 
   // check if username is already in db
   const userWithUsername = await Users.findOne({ username });
@@ -43,12 +40,10 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   // handle validation errors
-  userValidation.handleValidation(req);
+  userValidation.handleResults(req, res);
 
   const updateUserObject = {};
-  const { username, password, email, birthday } = matchedData(req, {
-    includeOptional: false,
-  });
+  const { username, password, email, birthday } = req.body;
 
   if (username) {
     // check if username exists in db

@@ -1,5 +1,5 @@
 const { body, matchedData, validationResult } = require('express-validator');
-const response = require('../responses');
+const response = require('../responses/responses');
 
 const usernameExists = body('username', 'Username is required').exists({
   checkFalsy: true,
@@ -52,8 +52,8 @@ exports.validateUpdateUserData = [
   birthdayRules.optional(),
 ];
 
-exports.handleValidation = (req) => {
-  const errors = validationResult(req);
+exports.handleResults = (req, res) => {
+  const errors = validationResult(req, res);
   if (!errors.isEmpty()) {
     return response.validationErrors(res, errors);
   }
