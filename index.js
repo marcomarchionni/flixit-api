@@ -1,10 +1,13 @@
 const express = require('express'),
   morgan = require('morgan'),
-  uuid = require('uuid'),
   bodyParser = require('body-parser'),
+  cors = require('cors'),
   mongoose = require('mongoose'),
-  Models = require('./models.js'),
-  response = require('./responses.js');
+  passport = require('passport'),
+  Models = require('./models'),
+  response = require('./responses.js'),
+  userController = require('./controllers/user.js'),
+  userValidation = require('./validation/user');
 
 const Movies = Models.Movie;
 const Users = Models.User;
@@ -23,27 +26,31 @@ function isEmpty(arr) {
   return false;
 }
 
-// validation
-function userIsValid(user) {
-  return user && user.username && user.email && user.password;
-}
-
-function userUpdateIsValid(update) {
-  const atLeastOneFieldNotNull =
-    update.username || update.email || update.password || update.birthday;
-  const validFields = Object.keys(update).every((key) =>
-    ['username', 'email', 'password', 'birthday'].includes(key)
-  );
-  return update && atLeastOneFieldNotNull && validFields;
-}
-
-// init middleware
+/* Middleware */
+// Logging
 app.use(morgan('common'));
+
+// Body Parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const auth = require('./auth.js')(app);
-const passport = require('passport');
+// Cors
+const allowedOrigins = ['http://localhost:8080'];
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (!allowedOrigins.includes(origin)) {
+        const message = `The CORS policy for this application doesn’t allow access from origin ${origin}`;
+        return callback(new Error(message), false);
+      }
+      // origin is allowed
+      return callback(null, true);
+    },
+  })
+);
+
+require('./auth.js')(app);
 require('./passport');
 
 // Static Requests
@@ -157,140 +164,39 @@ app.get(
 );
 
 // CREATE new user
-app.post('/users', (req, res) => {
-  const user = req.body;
-  console.log(user);
-  if (!userIsValid(user)) {
-    console.log('invalid user');
-    response.invalidData(res);
-  } else {
-    // check if username and email are already taken
-    Users.findOne({
-      $or: [{ email: user.email }, { username: user.username }],
-    })
-      .then((result) => {
-        if (result && result.email === user.email) {
-          return response.alreadyUserWithEmail(res, user.email);
-        }
-        if (result && result.email === user.username) {
-          return response.alreadyUserWithUsername(res, user.username);
-        }
-        // username and email not in db, so create new user
-        return Users.create({
-          username: user.username,
-          email: user.email,
-          password: user.password,
-          birthday: user.birthday,
-        }).then((createdUser) => response.created(res, createdUser));
-      })
-      .catch((err) => response.serverError(res, err));
-  }
-});
+app.post(
+  '/users',
+  userValidation.validateCreateUserData,
+  userController.createUser
+);
 
 // UPDATE user info
 app.put(
   '/users/:username',
   passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    // validate request data
-    const userUpdate = req.body;
-    if (!userUpdateIsValid(userUpdate)) {
-      return response.invalidData(res, userUpdate);
-    }
-    // valid data, update db
-    Users.findOneAndUpdate(
-      { username: req.params.username },
-      { $set: userUpdate },
-      { new: true }
-    )
-      .then((userUpdated) => {
-        if (!userUpdated) {
-          return response.noUserWithUsername(req.params.username);
-        } else {
-          return response.success(res, userUpdated);
-        }
-      })
-      .catch((err) => response.serverError(res, err));
-  }
+  userValidation.validateUpdateUserData,
+  userController.updateUser
 );
 
 // ADD movie to user list of favourites
 app.put(
   '/users/:username/movies/:movieId',
   passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    const username = req.params.username;
-    const movieId = req.params.movieId;
-    // check if movieId is valid
-    Movies.findById(movieId)
-      .then((movieFound) => {
-        if (!movieFound) {
-          return response.noMovieWithMovieId(res, movieId);
-        } else {
-          // update user with movieId
-          return Users.findOneAndUpdate(
-            { username: username },
-            { $addToSet: { favouriteMovies: movieId } },
-            { new: true }
-          ).then((updatedUser) => {
-            if (!updatedUser) {
-              response.noUserWithUsername(res, username);
-            } else {
-              response.success(res, updatedUser);
-            }
-          });
-        }
-      })
-      .catch((err) => response.serverError(res, err));
-  }
+  userController.addMovie
 );
 
 // DELETE movie from list of favourites
 app.delete(
   '/users/:username/movies/:movieId',
   passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    const username = req.params.username;
-    const movieId = req.params.movieId;
-    //check if movieId is valid
-    Movies.findById(movieId)
-      .then((movieFound) => {
-        if (!movieFound) {
-          return response.noMovieWithMovieId(res, movieId);
-        } else {
-          return Users.findOneAndUpdate(
-            { username: username },
-            { $pull: { favouriteMovies: movieId } },
-            { new: true }
-          ).then((updatedUser) => {
-            if (!updatedUser) {
-              response.noUserWithUsername(res, username);
-            } else {
-              response.success(res, updatedUser);
-            }
-          });
-        }
-      })
-      .catch((err) => response.serverError(res, err));
-  }
+  userController.removeMovie
 );
 
 // DELETE user by username
 app.delete(
   '/users/:username',
   passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    const username = req.params.username;
-    Users.findOneAndDelete({ username: username })
-      .then((deletedUser) => {
-        if (!deletedUser) {
-          return response.noUserWithUsername(res, username);
-        } else {
-          return response.success(res, deletedUser);
-        }
-      })
-      .catch((err) => response.serverError(res, err));
-  }
+  userController.deleteUser
 );
 
 // Error Handling

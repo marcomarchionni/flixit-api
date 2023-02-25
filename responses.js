@@ -60,6 +60,10 @@ exports.invalidData = (res) => {
   res.status(400).json({ status: 400, message: `Invalid request data` });
 };
 
+exports.validationErrors = (res, errors) => {
+  res.status(422).json({ status: 422, message: errors.array() });
+};
+
 exports.serverError = (res, err) => {
   console.error(err.stack);
   res
