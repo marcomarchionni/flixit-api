@@ -1,53 +1,54 @@
+const {
+  noMovieWithTitleError,
+  noMoviesWithDirectorError,
+  noMoviesWithGenreError,
+} = require('../errors/custom-errors');
 const { Movies } = require('../models/models');
-const response = require('../responses/responses');
+const { isEmptyArray } = require('../utils/utils');
 
-// helper methods
-function isEmpty(arr) {
-  if (!Array.isArray(arr) || arr.length === 0) return true;
-  return false;
-}
+// helper method
 
-exports.findMovies = (req, res) => {
+exports.findMovies = (req, res, next) => {
   Movies.find()
-    .then((movies) => response.success(res, movies))
-    .catch((err) => response.serverError(res, err));
+    .then((movies) => res.json(movies))
+    .catch((err) => next(err));
 };
 
-exports.findMovieByTitle = (req, res) => {
+exports.findMovieByTitle = (req, res, next) => {
   const title = req.params.title;
   Movies.findOne({ title: title })
     .then((movieFound) => {
       if (!movieFound) {
-        response.noMovieWithTitle(res, title);
+        throw new noMovieWithTitleError(title);
       } else {
-        response.success(res, movieFound);
+        res.json(movieFound);
       }
     })
-    .catch((err) => response.serverError(res, err));
+    .catch((err) => next(err));
 };
 
-exports.findMovieByDirector = (req, res) => {
+exports.findMovieByDirector = (req, res, next) => {
   const directorName = req.params.director;
   Movies.find({ 'director.name': directorName })
     .then((movies) => {
-      if (isEmpty(movies)) {
-        response.noMoviesWithDirector(res, directorName);
+      if (isEmptyArray(movies)) {
+        throw new noMoviesWithDirectorError(directorName);
       } else {
-        response.success(res, movies);
+        res.json(movies);
       }
     })
-    .catch((err) => response.serverError(res, err));
+    .catch((err) => next(err));
 };
 
-exports.findMovieByGenre = (req, res) => {
+exports.findMovieByGenre = (req, res, next) => {
   const genreName = req.params.genreName;
   Movies.find({ 'genre.name': genreName })
     .then((movies) => {
-      if (isEmpty(movies)) {
-        response.noMoviesWithGenre(res, genreName);
+      if (isEmptyArray(movies)) {
+        throw new noMoviesWithGenreError(genreName);
       } else {
-        response.success(res, movies);
+        res.json(movies);
       }
     })
-    .catch((err) => response.serverError(res, err));
+    .catch((err) => next(err));
 };

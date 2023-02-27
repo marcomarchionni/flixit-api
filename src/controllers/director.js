@@ -1,15 +1,15 @@
+const { noDirectorWithNameError } = require('../errors/custom-errors');
 const { Movies } = require('../models/models');
-const response = require('../responses/responses.js');
 
-exports.findDirectorByName = (req, res) => {
+exports.findDirectorByName = (req, res, next) => {
   const directorName = req.params.directorName;
   Movies.findOne({ 'director.name': directorName })
     .then((result) => {
-      if (result) {
-        response.success(res, result.director);
+      if (!result) {
+        throw new noDirectorWithNameError(directorName);
       } else {
-        response.noDirectorWithName(res, directorName);
+        res.json(result.director);
       }
     })
-    .catch((err) => response.serverError(res, err));
+    .catch((err) => next(err));
 };

@@ -1,16 +1,16 @@
 const express = require('express'),
+  mongoose = require('mongoose'),
   morgan = require('morgan'),
   bodyParser = require('body-parser'),
-  cors = require('cors'),
-  mongoose = require('mongoose'),
-  response = require('./src/responses/responses.js'),
-  routes = require('./src/routes/routes');
+  cors = require('./src/middleware/cors'),
+  routes = require('./src/routes/routes'),
+  { customErrorHandler } = require('./src/errors/error-handlers');
 
 const app = express();
 
 // Database connection
 mongoose.set('strictQuery', false);
-mongoose.connect('mongodb://127.0.0.1:27017/flixdb', {
+mongoose.connect(process.env.DB_CONNECTION_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -23,31 +23,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Cors
-const allowedOrigins = ['http://localhost:8080'];
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (!allowedOrigins.includes(origin)) {
-        const message = `The CORS policy for this application doesn’t allow access from origin ${origin}`;
-        return callback(new Error(message), false);
-      }
-      // origin is allowed
-      return callback(null, true);
-    },
-  })
-);
+app.use(cors.allowOrigins);
 
-// Static Requests
-app.use(express.static('src/public'));
-
-// API requests
-app.use('/', routes);
+// Routes
+app.use(routes);
 
 // Error Handling
-app.use((err, req, res, next) => {
-  response.serverError(res, err);
-});
+app.use(customErrorHandler);
 
 // Listen for requests
 app.listen(process.env.PORT, () => {

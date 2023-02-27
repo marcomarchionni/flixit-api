@@ -4,8 +4,11 @@ const userController = require('../controllers/user.js'),
   movieController = require('../controllers/movie'),
   genreController = require('../controllers/genre'),
   directorController = require('../controllers/director'),
-  userValidation = require('../validation/user'),
-  auth = require('../authentication/auth.js');
+  validation = require('../middleware/validation'),
+  authentication = require('../middleware/authentication.js');
+
+// Static
+router.use(express.static('src/public'));
 
 // ROOT
 router.get('/', (req, res) => {
@@ -13,79 +16,81 @@ router.get('/', (req, res) => {
 });
 
 // LOGIN user
-router.post('/login', auth.localAuthentication);
+router.post('/login', authentication.localAuth);
 
 // GET list of all movies
-router.get('/movies', auth.JWTAutentication, movieController.findMovies);
+router.get('/movies', authentication.JWTAuth, movieController.findMovies);
 
 // GET movies by title
 router.get(
   '/movies/:title',
-  auth.JWTAutentication,
+  authentication.JWTAuth,
   movieController.findMovieByTitle
 );
 
 // GET movies by director
 router.get(
   '/movies/directors/:director',
-  auth.JWTAutentication,
+  authentication.JWTAuth,
   movieController.findMovieByDirector
 );
 
 // GET movies by genre
 router.get(
   '/movies/genres/:genreName',
-  auth.JWTAutentication,
+  authentication.JWTAuth,
   movieController.findMovieByGenre
 );
 
 // GET genre by name
 router.get(
   '/genres/:genreName',
-  auth.JWTAutentication,
+  authentication.JWTAuth,
   genreController.findGenreByName
 );
 
 // GET director by name
 router.get(
   '/directors/:directorName',
-  auth.JWTAutentication,
+  authentication.JWTAuth,
   directorController.findDirectorByName
 );
 
 // CREATE new user
 router.post(
   '/users',
-  userValidation.validateCreateUserData,
+  validation.createUserRules,
+  validation.handleResults,
   userController.createUser
 );
 
 // UPDATE user
 router.put(
   '/users/:username',
-  auth.JWTAutentication,
-  userValidation.validateUpdateUserData,
+  authentication.JWTAuth,
+  validation.updateUserRules,
+  validation.handleResults,
   userController.updateUser
 );
 
 // ADD movie to user list of favourites
 router.put(
   '/users/:username/movies/:movieId',
-  auth.JWTAutentication,
+  authentication.JWTAuth,
   userController.addMovie
 );
 
 // DELETE movie from list of favourites
 router.delete(
   '/users/:username/movies/:movieId',
-  auth.JWTAutentication,
+  authentication.JWTAuth,
   userController.removeMovie
 );
 
 // DELETE user by username
 router.delete(
   '/users/:username',
-  auth.JWTAutentication,
+  authentication.JWTAuth,
   userController.deleteUser
 );
 

@@ -1,5 +1,5 @@
-const { body, matchedData, validationResult } = require('express-validator');
-const response = require('../responses/responses');
+const { body, validationResult } = require('express-validator');
+const { ValidationErrors } = require('../errors/custom-errors');
 
 const usernameExists = body('username', 'Username is required').exists({
   checkFalsy: true,
@@ -33,7 +33,7 @@ const passwordLength = body(
 const emailRules = body('email', 'Invalid Email format').isEmail();
 const birthdayRules = body('birthday', 'Invalid Date format').isDate();
 
-exports.validateCreateUserData = [
+exports.createUserRules = [
   usernameExists,
   usernameAlphanumeric,
   usernameLength,
@@ -44,7 +44,7 @@ exports.validateCreateUserData = [
   birthdayRules.optional(),
 ];
 
-exports.validateUpdateUserData = [
+exports.updateUserRules = [
   usernameAlphanumeric.optional(),
   usernameLength.optional(),
   passwordLength.optional(),
@@ -52,9 +52,13 @@ exports.validateUpdateUserData = [
   birthdayRules.optional(),
 ];
 
-exports.handleResults = (req, res) => {
-  const errors = validationResult(req, res);
-  if (!errors.isEmpty()) {
-    return response.validationErrors(res, errors);
+exports.handleResults = (req, res, next) => {
+  try {
+    const errors = validationResult(req, res);
+    if (!errors.isEmpty()) {
+      throw new ValidationErrors(errors);
+    }
+  } catch (err) {
+    next(err);
   }
 };
