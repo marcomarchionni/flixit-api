@@ -4,7 +4,11 @@ const express = require('express'),
   bodyParser = require('body-parser'),
   cors = require('./src/middleware/cors'),
   routes = require('./src/routes/routes'),
-  { customErrorHandler } = require('./src/errors/error-handlers');
+  {
+    customErrorHandler,
+    invalidPathHandler,
+    errorLogger,
+  } = require('./src/errors/error-handlers');
 
 const app = express();
 
@@ -23,15 +27,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Cors
-app.use(cors.allowOrigins);
+app.use(cors.applyCORSPolicy);
 
 // Routes
 app.use(routes);
 
 // Error Handling
+app.use(errorLogger);
 app.use(customErrorHandler);
+app.use(invalidPathHandler);
 
 // Listen for requests
-app.listen(process.env.PORT, () => {
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
   console.log(`Movie App is listening on port ${process.env.PORT}.`);
 });

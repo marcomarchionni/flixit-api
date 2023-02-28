@@ -30,8 +30,8 @@ const passwordLength = body(
   min: 4,
 });
 
-const emailRules = body('email', 'Invalid Email format').isEmail();
-const birthdayRules = body('birthday', 'Invalid Date format').isDate();
+const emailRules = body('email', 'Invalid email format').isEmail();
+const birthdayRules = body('birthday', 'Invalid date format').isDate();
 
 exports.createUserRules = [
   usernameExists,
@@ -53,12 +53,10 @@ exports.updateUserRules = [
 ];
 
 exports.handleResults = (req, res, next) => {
-  try {
-    const errors = validationResult(req, res);
-    if (!errors.isEmpty()) {
-      throw new ValidationErrors(errors);
-    }
-  } catch (err) {
-    next(err);
+  const errors = validationResult(req, res);
+  if (!errors.isEmpty()) {
+    next(new ValidationErrors(errors));
+  } else {
+    next();
   }
 };

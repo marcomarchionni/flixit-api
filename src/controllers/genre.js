@@ -1,4 +1,4 @@
-const { noGenreWithNameError } = require('../errors/custom-errors');
+const { NoGenreWithNameError } = require('../errors/custom-errors');
 const { Movies } = require('../models/models');
 
 exports.findGenreByName = (req, res, next) => {
@@ -6,7 +6,7 @@ exports.findGenreByName = (req, res, next) => {
   Movies.findOne({ 'genre.name': genreName }, { genre: 1 })
     .then((result) => {
       if (!result) {
-        throw new noGenreWithNameError(genreName);
+        throw new NoGenreWithNameError(genreName);
       } else {
         res.json(result.genre);
       }

@@ -63,20 +63,16 @@ const generateJWTToken = (user) => {
 
 exports.localAuth = (req, res, next) => {
   passport.authenticate('local', { session: false }, (err, user) => {
-    try {
-      if (err) {
-        throw err;
-      }
-      req.login(user, { session: false }, (error) => {
-        if (error) {
-          throw new ServerError(error);
-        }
-        const token = generateJWTToken(user.toJSON());
-        return res.json({ user, token });
-      });
-    } catch (err) {
+    if (err) {
       next(err);
     }
+    req.login(user, { session: false }, (error) => {
+      if (error) {
+        next(new ServerError(error));
+      }
+      const token = generateJWTToken(user.toJSON());
+      return res.json({ user, token });
+    });
   })(req, res, next);
 };
 

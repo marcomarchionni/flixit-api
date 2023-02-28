@@ -1,7 +1,7 @@
 const {
-  noMovieWithTitleError,
-  noMoviesWithDirectorError,
-  noMoviesWithGenreError,
+  NoMovieWithTitleError,
+  NoMoviesWithDirectorError,
+  NoMoviesWithGenreError,
 } = require('../errors/custom-errors');
 const { Movies } = require('../models/models');
 const { isEmptyArray } = require('../utils/utils');
@@ -11,7 +11,7 @@ const { isEmptyArray } = require('../utils/utils');
 exports.findMovies = (req, res, next) => {
   Movies.find()
     .then((movies) => res.json(movies))
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 exports.findMovieByTitle = (req, res, next) => {
@@ -19,12 +19,12 @@ exports.findMovieByTitle = (req, res, next) => {
   Movies.findOne({ title: title })
     .then((movieFound) => {
       if (!movieFound) {
-        throw new noMovieWithTitleError(title);
+        throw new NoMovieWithTitleError(title);
       } else {
         res.json(movieFound);
       }
     })
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 exports.findMovieByDirector = (req, res, next) => {
@@ -32,12 +32,12 @@ exports.findMovieByDirector = (req, res, next) => {
   Movies.find({ 'director.name': directorName })
     .then((movies) => {
       if (isEmptyArray(movies)) {
-        throw new noMoviesWithDirectorError(directorName);
+        throw new NoMoviesWithDirectorError(directorName);
       } else {
         res.json(movies);
       }
     })
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 exports.findMovieByGenre = (req, res, next) => {
@@ -45,10 +45,10 @@ exports.findMovieByGenre = (req, res, next) => {
   Movies.find({ 'genre.name': genreName })
     .then((movies) => {
       if (isEmptyArray(movies)) {
-        throw new noMoviesWithGenreError(genreName);
+        throw new NoMoviesWithGenreError(genreName);
       } else {
         res.json(movies);
       }
     })
-    .catch((err) => next(err));
+    .catch(next);
 };

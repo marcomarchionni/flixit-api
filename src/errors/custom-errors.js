@@ -86,6 +86,13 @@ class ValidationErrors extends CustomError {
   }
 }
 
+class CORSError extends CustomError {
+  constructor(origin) {
+    const message = `The CORS policy for this application doesn’t allow access from origin ${origin}`;
+    super(400, message);
+  }
+}
+
 class ServerError extends CustomError {
   constructor(error) {
     const message = error.msg || 'Server error';
@@ -107,5 +114,6 @@ module.exports = {
   AlreadyUserWithEmailError,
   ValidationErrors,
   InvalidCredentialsError,
+  CORSError,
   ServerError,
 };
