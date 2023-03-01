@@ -15,4 +15,4 @@ const corsOptions = {
   },
 };
 
-exports.applyCORSPolicy = cors();
+exports.applyCORSPolicy = cors(corsOptions);

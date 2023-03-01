@@ -1,5 +1,4 @@
 const {
-  NoUserWithUsernameError,
   ServerError,
   InvalidCredentialsError,
 } = require('../errors/custom-errors.js');
@@ -42,7 +41,6 @@ passport.use(
       secretOrKey: process.env.JWT_SECRET,
     },
     (jwtPayLoad, callback) => {
-      console.log(jwtPayLoad);
       return Users.findById(jwtPayLoad._id)
         .then((user) => {
           return callback(null, user);

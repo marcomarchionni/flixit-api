@@ -1,5 +1,5 @@
 const express = require('express'),
-  mongoose = require('mongoose'),
+  dbConnection = require('./src/db-connection/db-connection.js'),
   morgan = require('morgan'),
   bodyParser = require('body-parser'),
   cors = require('./src/middleware/cors'),
@@ -13,11 +13,7 @@ const express = require('express'),
 const app = express();
 
 // Database connection
-mongoose.set('strictQuery', false);
-mongoose.connect(process.env.DB_CONNECTION_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+dbConnection.connect();
 
 // Logging
 app.use(morgan('common'));
