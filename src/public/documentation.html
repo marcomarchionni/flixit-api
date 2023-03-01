@@ -161,11 +161,41 @@
   {
     "username": "Rossi",
     "email": "rossi@xyz.com"
-    "password": "1234",
+    "password": "{{hashed password}}",
     "birthday": "1972-03-08T00:00:00.000Z",
     "_id": "63f52fb800370a3552ad9eb0",
     "favouriteMovies": [],
     ...
+  }
+                      </pre>
+                    </code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Login user</td>
+                  <td class="text-danger fw-bold">POST</td>
+                  <td>
+                    <code
+                      >/login?username=&lt;username&gt;&amp;password=&lt;password&gt;</code
+                    >
+                  </td>
+                  <td>None</td>
+
+                  <td>
+                    A JSON object holding data of user and token. Es.
+                    <code>
+                      <pre class="mt-2">
+  {
+    "user": {
+      "username": "Rossi",
+      "email": "rossi@xyz.com"
+      "password": "{{hashed password}}",
+      "birthday": "1972-03-08T00:00:00.000Z",
+      "_id": "63f52fb800370a3552ad9eb0",
+      "favouriteMovies": [],
+      ...
+      },
+    "token": "..."
   }
                       </pre>
                     </code>
@@ -195,7 +225,7 @@
   {
     "username": "MarioRossi",
     "email": "mario.rossi@xyz.com"
-    "password": "1234",
+    "password": "{{hashed password}}",
     "birthday": "1972-03-08T00:00:00.000Z",
     "_id": "63f52fb800370a3552ad9eb0",
     "favouriteMovies": [],
@@ -217,7 +247,7 @@
   {
     "name": "Mario Rossi",
     "email": "mario.rossi@xyz.com",
-    "password": "1234",
+    "password": "{{hashed password}}",
     "birthday": "1972-03-08T00:00:00.000Z",
     "_id": "63f52fb800370a3552ad9eb0",
     "favouriteMovies": [
@@ -240,7 +270,7 @@
   {
     "name": "Mario Rossi",
     "email": "mario.rossi@xyz.com",
-    "password": "1234",
+    "password": "{{hashed password}}",
     "birthday": "1972-03-08T00:00:00.000Z",
     "_id": "63f52fb800370a3552ad9eb0",
     "favouriteMovies": []
