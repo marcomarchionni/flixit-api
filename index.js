@@ -2,7 +2,7 @@ const express = require('express'),
   dbConnection = require('./src/db-connection/db-connection.js'),
   morgan = require('morgan'),
   bodyParser = require('body-parser'),
-  cors = require('./src/middleware/cors'),
+  cors = require('cors'),
   routes = require('./src/routes/routes'),
   {
     customErrorHandler,
@@ -22,8 +22,8 @@ app.use(morgan('common'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Cors
-app.use(cors.applyCORSPolicy);
+// Allow all Cross Origin Requests
+app.use(cors());
 
 // Routes
 app.use(routes);
