@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 router.post('/login', authentication.localAuth);
 
 // GET list of all movies
-router.get('/movies', authentication.JWTAuth, movieController.findMovies);
+router.get('/movies', movieController.findMovies);
 
 // GET movies by title
 router.get(
