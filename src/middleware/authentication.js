@@ -64,10 +64,12 @@ exports.localAuth = (req, res, next) => {
   passport.authenticate('local', { session: false }, (err, user) => {
     if (err) {
       next(err);
+      return;
     }
     req.login(user, { session: false }, (error) => {
       if (error) {
         next(new ServerError(error));
+        return;
       }
       const token = generateJWTToken(user.toJSON());
       return res.json({ user, token });
