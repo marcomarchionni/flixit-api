@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-let movieSchema = mongoose.Schema({
+const movieSchema = mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   year: String,
@@ -27,7 +27,7 @@ let movieSchema = mongoose.Schema({
   featured: Boolean,
 });
 
-let userSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
   username: { type: String, required: true },
   password: { type: String, required: true },
   email: { type: String, required: true },
@@ -35,10 +35,9 @@ let userSchema = mongoose.Schema({
   favouriteMovies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
 });
 
-userSchema.statics.hashPassword = (password) => {
-  return bcrypt.hashSync(password, 10);
-};
+userSchema.statics.hashPassword = (password) => bcrypt.hashSync(password, 10);
 
+// eslint-disable-next-line func-names
 userSchema.methods.validatePassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };

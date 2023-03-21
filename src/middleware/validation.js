@@ -1,5 +1,5 @@
 const { body, validationResult } = require('express-validator');
-const { ValidationErrors } = require('../errors/custom-errors');
+const ValidationErrors = require('../error-handling/errors/validation-error');
 
 const usernameExists = body('username', 'Username is required').exists({
   checkFalsy: true,
@@ -55,8 +55,7 @@ exports.updateUserRules = [
 exports.handleResults = (req, res, next) => {
   const errors = validationResult(req, res);
   if (!errors.isEmpty()) {
-    next(new ValidationErrors(errors));
-  } else {
-    next();
+    return next(new ValidationErrors(errors));
   }
+  return next();
 };

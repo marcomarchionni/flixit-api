@@ -1,11 +1,12 @@
 const express = require('express');
+const userController = require('../controllers/user');
+const movieController = require('../controllers/movie');
+const genreController = require('../controllers/genre');
+const directorController = require('../controllers/director');
+const validation = require('../middleware/validation');
+const authentication = require('../middleware/authentication');
+
 const router = express.Router();
-const userController = require('../controllers/user.js'),
-  movieController = require('../controllers/movie'),
-  genreController = require('../controllers/genre'),
-  directorController = require('../controllers/director'),
-  validation = require('../middleware/validation'),
-  authentication = require('../middleware/authentication.js');
 
 // Static
 router.use(express.static('src/public'));

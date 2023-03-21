@@ -1,16 +1,13 @@
-const {
-  ServerError,
-  InvalidCredentialsError,
-} = require('../errors/custom-errors.js');
+const { sign } = require('jsonwebtoken');
+const passport = require('passport');
+const passportJWT = require('passport-jwt');
+const LocalStrategy = require('passport-local').Strategy;
+const { Users } = require('../models/models');
+const InvalidCredentialsError = require('../error-handling/errors/invalid-credentials-error');
+const ServerError = require('../error-handling/errors/server-error');
 
-const passport = require('passport'),
-  LocalStrategy = require('passport-local').Strategy,
-  passportJWT = require('passport-jwt'),
-  jwt = require('jsonwebtoken'),
-  { Users } = require('../models/models.js');
-
-const JWTStrategy = passportJWT.Strategy,
-  ExtractJWT = passportJWT.ExtractJwt;
+const JWTStrategy = passportJWT.Strategy;
+const ExtractJWT = passportJWT.ExtractJwt;
 
 passport.use(
   new LocalStrategy(
@@ -40,25 +37,24 @@ passport.use(
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.JWT_SECRET,
     },
-    (jwtPayLoad, callback) => {
-      return Users.findById(jwtPayLoad._id)
-        .then((user) => {
-          return callback(null, user);
-        })
-        .catch((err) => {
-          return callback(err);
-        });
+    async (jwtPayLoad, callback) => {
+      try {
+        // eslint-disable-next-line no-underscore-dangle
+        const user = await Users.findById(jwtPayLoad._id);
+        return callback(null, user);
+      } catch (err) {
+        return callback(err);
+      }
     }
   )
 );
 
-const generateJWTToken = (user) => {
-  return jwt.sign(user, process.env.JWT_SECRET, {
+const generateJWTToken = (user) =>
+  sign(user, process.env.JWT_SECRET, {
     subject: user.username,
     expiresIn: '7d',
     algorithm: 'HS256',
   });
-};
 
 exports.localAuth = (req, res, next) => {
   passport.authenticate('local', { session: false }, (err, user) => {
@@ -68,8 +64,7 @@ exports.localAuth = (req, res, next) => {
     }
     req.login(user, { session: false }, (error) => {
       if (error) {
-        next(new ServerError(error));
-        return;
+        return next(new ServerError(error));
       }
       const token = generateJWTToken(user.toJSON());
       return res.json({ user, token });

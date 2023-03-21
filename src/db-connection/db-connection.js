@@ -7,8 +7,8 @@ exports.connect = () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
-    .catch((err) => console.error('MongoDb connection failed: ' + err));
+    .catch((err) => console.error(`MongoDb connection failed: ${err}`));
   mongoose.connection.on('error', (err) => {
-    console.error('MongoDb connection error: ' + err);
+    console.error(`MongoDb connection error: ${err}`);
   });
 };

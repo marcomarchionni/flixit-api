@@ -1,14 +1,14 @@
-const express = require('express'),
-  dbConnection = require('./src/db-connection/db-connection.js'),
-  morgan = require('morgan'),
-  bodyParser = require('body-parser'),
-  cors = require('cors'),
-  routes = require('./src/routes/routes'),
-  {
-    customErrorHandler,
-    invalidPathHandler,
-    errorLogger,
-  } = require('./src/errors/error-handlers');
+const express = require('express');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const dbConnection = require('./src/db-connection/db-connection');
+const routes = require('./src/routes/routes');
+const {
+  customErrorHandler,
+  invalidPathHandler,
+  errorLogger,
+} = require('./src/error-handling/error-handlers');
 
 const app = express();
 
@@ -36,5 +36,6 @@ app.use(invalidPathHandler);
 // Listen for requests
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
-  console.log(`Movie App is listening on port ${process.env.PORT}.`);
+  // eslint-disable-next-line no-console
+  console.info(`Movie App is listening on port ${process.env.PORT}.`);
 });

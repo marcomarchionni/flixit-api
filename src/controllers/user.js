@@ -1,10 +1,8 @@
 const { Users, Movies } = require('../models/models');
-const {
-  AlreadyUserWithUsernameError,
-  AlreadyUserWithEmailError,
-  NoUserWithUsernameError,
-  NoMovieWithIdError,
-} = require('../errors/custom-errors');
+const AlreadyUserWithUsernameError = require('../error-handling/errors/already-user-with-username-error');
+const AlreadyUserWithEmailError = require('../error-handling/errors/already-user-with-email-error');
+const NoUserWithUsernameError = require('../error-handling/errors/no-user-with-username-error');
+const NoMovieWithIdError = require('../error-handling/errors/no-movie-with-id-error');
 
 exports.createUser = async (req, res, next) => {
   try {
@@ -92,8 +90,8 @@ exports.updateUser = async (req, res, next) => {
 
 exports.addMovie = async (req, res, next) => {
   try {
-    const username = req.params.username;
-    const movieId = req.params.movieId;
+    const { username } = req.params;
+    const { movieId } = req.params;
 
     // check if movieId is valid
     const movieFound = await Movies.findById(movieId);
@@ -102,7 +100,7 @@ exports.addMovie = async (req, res, next) => {
     } else {
       // update user with movieId
       const updatedUser = await Users.findOneAndUpdate(
-        { username: username },
+        { username },
         { $addToSet: { favouriteMovies: movieId } },
         { new: true }
       );
@@ -119,16 +117,16 @@ exports.addMovie = async (req, res, next) => {
 
 exports.removeMovie = async (req, res, next) => {
   try {
-    const username = req.params.username;
-    const movieId = req.params.movieId;
+    const { username } = req.params;
+    const { movieId } = req.params;
 
-    //check if movieId exists
+    // Check if movieId exists
     const movieFound = await Movies.findById(movieId);
     if (!movieFound) {
       throw new NoMovieWithIdError(movieId);
     } else {
       const updatedUser = await Users.findOneAndUpdate(
-        { username: username },
+        { username },
         { $pull: { favouriteMovies: movieId } },
         { new: true }
       );
@@ -139,14 +137,14 @@ exports.removeMovie = async (req, res, next) => {
       }
     }
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
 exports.deleteUser = async (req, res, next) => {
   try {
-    const username = req.params.username;
-    const deletedUser = await Users.findOneAndDelete({ username: username });
+    const { username } = req.params;
+    const deletedUser = await Users.findOneAndDelete({ username });
     if (!deletedUser) {
       throw new NoUserWithUsernameError(username);
     } else {
