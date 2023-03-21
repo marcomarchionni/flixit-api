@@ -4,6 +4,7 @@ const passportJWT = require('passport-jwt');
 const LocalStrategy = require('passport-local').Strategy;
 const { Users } = require('../models/models');
 const InvalidCredentialsError = require('../error-handling/errors/invalid-credentials-error');
+const UnauthorizedError = require('../error-handling/errors/unauthorized-error');
 const ServerError = require('../error-handling/errors/server-error');
 
 const JWTStrategy = passportJWT.Strategy;
@@ -72,4 +73,17 @@ exports.localAuth = (req, res, next) => {
   })(req, res, next);
 };
 
-exports.JWTAuth = passport.authenticate('jwt', { session: false });
+exports.JWTAuth = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
+    if (err) {
+      return next(new UnauthorizedError(err));
+    }
+    const userIsInvalid = !user;
+    const pathUsernameIsDifferentFromTokenUsername =
+      req.params.username && req.params.username !== user.username;
+    if (userIsInvalid || pathUsernameIsDifferentFromTokenUsername) {
+      return next(new UnauthorizedError());
+    }
+    return next();
+  })(req, res, next);
+};

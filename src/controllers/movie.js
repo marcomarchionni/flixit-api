@@ -2,7 +2,7 @@ const NoMoviesWithDirectorError = require('../error-handling/errors/no-movie-wit
 const NoMoviesWithGenreError = require('../error-handling/errors/no-movie-with-genre-error');
 const NoMovieWithTitleError = require('../error-handling/errors/no-movie-with-title-error');
 const { Movies } = require('../models/models');
-const isEmptyArray = require('../utils/utils');
+const { isEmptyArray } = require('../utils/utils');
 
 exports.findMovies = (req, res, next) => {
   Movies.find()
