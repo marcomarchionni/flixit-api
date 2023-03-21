@@ -44,9 +44,13 @@ exports.createUser = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const updateUserObject = {};
+    const currentUsername = req.params.username;
     const { username, password, email, birthday } = req.body;
 
-    if (username) {
+    const usernameIsDifferentFromCurrent =
+      username && username !== currentUsername;
+
+    if (usernameIsDifferentFromCurrent) {
       // check if username exists in db
       const user = await Users.findOne({ username });
       if (user) {
@@ -56,8 +60,11 @@ exports.updateUser = async (req, res, next) => {
       }
     }
     if (email) {
-      // check if email exists in db
-      const user = await Users.findOne({ email });
+      // check if email exists in db apart from current user
+      const user = await Users.findOne({
+        email,
+        username: { $ne: currentUsername },
+      });
       if (user) {
         throw new AlreadyUserWithEmailError(email);
       } else {
