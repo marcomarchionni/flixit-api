@@ -15,14 +15,14 @@
     <div class="container">
       <div class="row justify-content-center m-4">
         <div class="col m-4 p-4 bg-white">
-          <h1 class="mt-5 text-center fw-bold display-1">ItFlix</h1>
-          <h4 class="text-center">API Documentation</h4>
+          <h1 class="mt-5 text-center fw-bold display-1">FlixIt API</h1>
+          <h4 class="text-center">Documentation</h4>
           <div class="p-4">
             <p>
               This web application provides access to information about movies
-              of the Golden Age of Italian Cinema (1960-1980). Users will be
-              able to sign up, update their personal information, and create a
-              list of their favorite movies.
+              from the Golden Age of Italian Cinema (1960-1980). Users are
+              allowed to sign up, update their personal information, and create
+              a list of their favorite movies.
             </p>
             <br />
             <h3 class="py-4">Available Endpoints</h3>
@@ -73,7 +73,14 @@
         ...
       }
     ],
-    "releaseYear": "1964"
+    "genre": {
+      "name": "Spaghetti Western",
+      "description": "..."
+    }
+    "year": "1964",
+    "posterUrl": "...",
+    "photoUrl": "..."
+    ...
   }
                       </pre>
                     </code>
@@ -148,7 +155,7 @@
   {
     "username": "Rossi",
     "email": "rossi@xyz.com",
-    "password": "1234",
+    "password": "...",
     "birthday": "1972-03-08"
   }
                       </pre>
@@ -163,7 +170,7 @@
     "email": "rossi@xyz.com"
     "password": "{{hashed password}}",
     "birthday": "1972-03-08T00:00:00.000Z",
-    "_id": "63f52fb800370a3552ad9eb0",
+    "_id": "...",
     "favouriteMovies": [],
     ...
   }
@@ -191,7 +198,7 @@
       "email": "rossi@xyz.com"
       "password": "{{hashed password}}",
       "birthday": "1972-03-08T00:00:00.000Z",
-      "_id": "63f52fb800370a3552ad9eb0",
+      "_id": "...",
       "favouriteMovies": [],
       ...
       },
@@ -227,7 +234,7 @@
     "email": "mario.rossi@xyz.com"
     "password": "{{hashed password}}",
     "birthday": "1972-03-08T00:00:00.000Z",
-    "_id": "63f52fb800370a3552ad9eb0",
+    "_id": "...",
     "favouriteMovies": [],
     ...
   }
@@ -249,9 +256,10 @@
     "email": "mario.rossi@xyz.com",
     "password": "{{hashed password}}",
     "birthday": "1972-03-08T00:00:00.000Z",
-    "_id": "63f52fb800370a3552ad9eb0",
+    "_id": "...",
     "favouriteMovies": [
-      "63ed66e38e058a92de1d455c"
+      "{movieId}",
+      ...
     ]
   }
                       </pre>
@@ -272,7 +280,7 @@
     "email": "mario.rossi@xyz.com",
     "password": "{{hashed password}}",
     "birthday": "1972-03-08T00:00:00.000Z",
-    "_id": "63f52fb800370a3552ad9eb0",
+    "_id": "...",
     "favouriteMovies": []
   }
                       </pre>
