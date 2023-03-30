@@ -1,7 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const cors = require('cors');
 const dbConnection = require('./src/db-connection/db-connection');
 const routes = require('./src/routes/routes');
 const {
@@ -9,6 +8,7 @@ const {
   invalidPathHandler,
   errorLogger,
 } = require('./src/error-handling/error-handlers');
+const { corsConfig } = require('./src/middleware/cors-config');
 
 const app = express();
 
@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Allow all Cross Origin Requests
-app.use(cors());
+app.use(corsConfig);
 
 // Routes
 app.use(routes);
