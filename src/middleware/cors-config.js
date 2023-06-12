@@ -3,7 +3,7 @@ const cors = require('cors');
 const allowedOrigins = [
   'http://www.testsite.com',
   'https://flix-it.netlify.app',
-  'http://localhost:1234',
+  'http://localhost',
 ];
 
 exports.corsConfig = cors({
