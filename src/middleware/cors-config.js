@@ -5,6 +5,7 @@ const allowedOrigins = [
   'https://flix-it.netlify.app',
   'http://localhost:1234',
   'http://localhost:4200',
+  'https://marcomarchionni.github.io/flixit-angular-client/',
 ];
 
 exports.corsConfig = cors({
