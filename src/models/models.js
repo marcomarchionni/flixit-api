@@ -1,3 +1,8 @@
+/**
+ * @file Defines the Mongoose schemas for movies and users.
+ * @version 1.0.0
+ */
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 

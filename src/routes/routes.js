@@ -1,3 +1,8 @@
+/**
+ * @file Defines the router for handling movie, user, genre, and director related routes.
+ * @version 1.0.0
+ */
+
 const express = require('express');
 const userController = require('../controllers/user');
 const movieController = require('../controllers/movie');

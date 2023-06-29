@@ -1,5 +1,13 @@
+/**
+ * @file Contains MongoDB connection configuration and setup.
+ * @version 1.0.0
+ */
+
 const mongoose = require('mongoose');
 
+/**
+ * Establishes a connection to MongoDB using the provided connection URI.
+ */
 exports.connect = () => {
   mongoose.set('strictQuery', false);
   mongoose

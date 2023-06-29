@@ -1,3 +1,11 @@
+/**
+ * @file Flixit API - Main Server File
+ * @version 1.0.0
+ * @description This is the main file of the Flixit API server. It sets up the server, establishes
+ * a connection to the MongoDB database, configures middleware, defines routes, and handles error
+ * responses. The server listens for incoming requests and provides responses accordingly.
+ */
+
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');

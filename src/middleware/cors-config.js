@@ -1,13 +1,25 @@
+/**
+ * @file Configures CORS handling for cross-origin requests.
+ * @version 1.0.0
+ */
+
 const cors = require('cors');
 
+/**
+ * The list of allowed origins for CORS requests.
+ * @type {string[]}
+ */
 const allowedOrigins = [
-  'http://www.testsite.com',
   'https://flix-it.netlify.app',
   'http://localhost:1234',
   'http://localhost:4200',
   'https://marcomarchionni.github.io',
 ];
 
+/**
+ * Configures the CORS handling for cross-origin requests.
+ * @type {function}
+ */
 exports.corsConfig = cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);

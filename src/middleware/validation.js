@@ -1,3 +1,8 @@
+/**
+ * @file Defines validation rules and error handling functions for user data.
+ * @version 1.0.0
+ */
+
 const { body, validationResult } = require('express-validator');
 const ValidationErrors = require('../error-handling/errors/validation-error');
 
@@ -33,6 +38,9 @@ const passwordLength = body(
 const emailRules = body('email', 'Invalid email format').isEmail();
 const birthdayRules = body('birthday', 'Invalid date format').isDate();
 
+/**
+ * Rules for the object required to create a new user.
+ */
 exports.createUserRules = [
   usernameExists,
   usernameAlphanumeric,
@@ -44,6 +52,9 @@ exports.createUserRules = [
   birthdayRules.optional(),
 ];
 
+/**
+ * Rules for the object required to update a user
+ */
 exports.updateUserRules = [
   usernameAlphanumeric.optional(),
   usernameLength.optional(),
@@ -52,6 +63,12 @@ exports.updateUserRules = [
   birthdayRules.optional(),
 ];
 
+/**
+ * Handles the validation results and throws a ValidationErrors object if errors exist.
+ * @param {object} req - The request object.
+ * @param {object} res - The response object.
+ * @param {function} next - The next middleware function.
+ */
 exports.handleResults = (req, res, next) => {
   const errors = validationResult(req, res);
   if (!errors.isEmpty()) {
