@@ -45,5 +45,5 @@ app.use(invalidPathHandler);
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
   // eslint-disable-next-line no-console
-  console.info(`Movie App is listening on port ${process.env.PORT}.`);
+  console.info(`Movie App is listening on port ${port}.`);
 });
