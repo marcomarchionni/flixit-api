@@ -9,12 +9,7 @@ const cors = require('cors');
  * The list of allowed origins for CORS requests.
  * @type {string[]}
  */
-const allowedOrigins = [
-  'https://flix-it.netlify.app',
-  'http://localhost:1234',
-  'http://localhost:4200',
-  'https://marcomarchionni.github.io',
-];
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 
 /**
  * Configures the CORS handling for cross-origin requests.

@@ -13,12 +13,13 @@ To run the FlixIt API locally, follow these steps:
 1. Clone the repository: `git clone https://github.com/your/repo.git`
 2. Navigate to the project directory: `cd repo`
 3. Install the dependencies: `npm install`
-4. Create a `.env` file on the root directory with the following variables:
+4. Include the following enviromental variables in a .env file:
 
 ```
     DB_CONNECTION_URI=your-mongodb-connection-uri
     JWT_SECRET=your-jwt-secret
     PORT=8080
+    ALLOWED_ORIGINS=http://localhost:1234,http://anothersite.com
 ```
 
 5. Start the server: `npm start`
