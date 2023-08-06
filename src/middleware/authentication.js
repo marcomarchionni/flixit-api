@@ -11,6 +11,7 @@ const { Users } = require('../models/models');
 const InvalidCredentialsError = require('../error-handling/errors/invalid-credentials-error');
 const UnauthorizedError = require('../error-handling/errors/unauthorized-error');
 const ServerError = require('../error-handling/errors/server-error');
+const InvalidRequestError = require('../error-handling/errors/invalid-request');
 
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
@@ -25,7 +26,7 @@ passport.use(
       Users.findOne({ username })
         .then((user) => {
           if (!user || !user.validatePassword(password)) {
-            throw new InvalidCredentialsError();
+            return callback(new InvalidCredentialsError());
           }
           // valid user
           return callback(null, user);
@@ -75,7 +76,11 @@ const generateJWTToken = (user) =>
  * @param {function} next - The next middleware function.
  */
 exports.localAuth = (req, res, next) => {
-  passport.authenticate('local', { session: false }, (err, user) => {
+  passport.authenticate('local', { session: false }, (err, user, info) => {
+    if (!user) {
+      next(new InvalidRequestError(info && info.message));
+      return;
+    }
     if (err) {
       next(err);
       return;
