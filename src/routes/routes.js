@@ -8,6 +8,7 @@ const userController = require('../controllers/user');
 const movieController = require('../controllers/movie');
 const genreController = require('../controllers/genre');
 const directorController = require('../controllers/director');
+const imagesController = require('../controllers/images');
 const validation = require('../middleware/validation');
 const authentication = require('../middleware/authentication');
 
@@ -100,4 +101,7 @@ router.delete(
   userController.deleteUser
 );
 
+router.get('/images', imagesController.listImages);
+router.post('/images', imagesController.uploadImage);
+router.get('/images/:fileName', imagesController.retrieveImage);
 module.exports = router;

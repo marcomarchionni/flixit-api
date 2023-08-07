@@ -9,6 +9,8 @@
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+// const fs = require('fs');
+const fileUpload = require('express-fileupload');
 const dbConnection = require('./src/db-connection/db-connection');
 const routes = require('./src/routes/routes');
 const {
@@ -29,6 +31,9 @@ app.use(morgan('common'));
 // Body Parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Enable file upload
+app.use(fileUpload());
 
 // Allow all Cross Origin Requests
 app.use(corsConfig);

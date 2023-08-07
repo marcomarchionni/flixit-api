@@ -4,6 +4,7 @@
  */
 
 const CustomError = require('./errors/custom-error');
+const S3Error = require('./errors/s3-error');
 
 /**
  * Logs the error to the console and passes it to the next middleware.
@@ -31,6 +32,8 @@ const customErrorHandler = (err, req, res, next) => {
       status: err.statusCode,
       message: err.message,
     });
+  } else if (err instanceof S3Error) {
+    res.status(err.statusCode).json(err);
   } else {
     res.status(500).json({
       status: 500,
