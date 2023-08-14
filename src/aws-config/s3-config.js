@@ -11,3 +11,5 @@ exports.s3Client = new S3Client({
 exports.s3BaseParams = {
   Bucket: process.env.BUCKET_NAME,
 };
+
+exports.uploadImagePrefix = process.env.UPLOAD_IMAGE_PREFIX || '';

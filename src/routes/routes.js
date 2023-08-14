@@ -101,7 +101,13 @@ router.delete(
   userController.deleteUser
 );
 
+// LIST images from S3 bucket
 router.get('/images', imagesController.listImages);
+
+// UPLOAD image to S3 bucket
 router.post('/images', imagesController.uploadImage);
+
+// RETRIEVE image from S3 bucket
 router.get('/images/:fileName', imagesController.retrieveImage);
+
 module.exports = router;

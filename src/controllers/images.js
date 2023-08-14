@@ -1,4 +1,8 @@
-const { s3Client, s3BaseParams } = require('../aws-config/s3-config');
+const {
+  s3Client,
+  s3BaseParams,
+  uploadImagePrefix,
+} = require('../aws-config/s3-config');
 const {
   ListObjectsV2Command,
   PutObjectCommand,
@@ -25,7 +29,7 @@ exports.uploadImage = (req, res, next) => {
 
     const putObjectParams = {
       ...s3BaseParams,
-      Key: image.name, // You can include a path structure here if you want
+      Key: uploadImagePrefix + image.name,
       Body: image.data, // The file buffer
     };
 
