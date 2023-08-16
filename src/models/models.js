@@ -28,7 +28,10 @@ const movieSchema = mongoose.Schema({
       bio: String,
     },
   ],
-  imageUrl: String,
+  photoUrl: String,
+  posterUrl: String,
+  imageUrls: [String],
+  resizedImageUrls: [String],
   featured: Boolean,
 });
 

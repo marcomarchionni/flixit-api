@@ -19,4 +19,7 @@ exports.connect = () => {
   mongoose.connection.on('error', (err) => {
     console.error(`MongoDb connection error: ${err}`);
   });
+  mongoose.connection.once('open', () => {
+    console.log('Connected to MongoDB');
+  });
 };

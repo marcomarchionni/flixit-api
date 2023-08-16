@@ -107,6 +107,9 @@ router.get('/images', imagesController.listImages);
 // UPLOAD image to S3 bucket
 router.post('/images', imagesController.uploadImage);
 
+// UPLOAD movie image to S3 bucket
+router.post('/images/:movieId', imagesController.uploadMovieImage);
+
 // RETRIEVE image from S3 bucket
 router.get('/images/:fileName', imagesController.retrieveImage);
 

@@ -12,4 +12,11 @@ exports.s3BaseParams = {
   Bucket: process.env.BUCKET_NAME,
 };
 
-exports.uploadImagePrefix = process.env.UPLOAD_IMAGE_PREFIX || '';
+exports.getImageKey = (movieId, imageName) =>
+  `${process.env.ORIGINAL_IMAGE_PREFIX}/${movieId}/${imageName}`;
+
+exports.getImageUrl = (movieId, imageName) =>
+  `https://${process.env.BUCKET_NAME}.s3.amazonaws.com/${process.env.ORIGINAL_IMAGE_PREFIX}/${movieId}/${imageName}`;
+
+exports.getResizedImageUrl = (movieId, imageName) =>
+  `https://${process.env.BUCKET_NAME}.s3.amazonaws.com/${process.env.RESIZED_IMAGE_PREFIX}/${movieId}/${imageName}`;
