@@ -8,7 +8,6 @@ exports.addImageUrls = async (req, res, next) => {
     try {
       // Add the signed urls to the movie object
       movie.imageUrls = await Promise.all(movie.imageKeys.map(createSignedUrl));
-      console.log('image urls', movie.imageUrls);
       movie.resizedImageUrls = await Promise.all(
         movie.resizedImageKeys.map(createSignedUrl)
       );
