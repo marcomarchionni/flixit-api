@@ -118,6 +118,10 @@ router.delete(
   userController.deleteUser
 );
 
+router.get('/admin/test', adminAuth.localAuth, (req, res) => {
+  res.send('Admin test successful');
+});
+
 // LIST images from S3 bucket
 router.get('/images', adminAuth.localAuth, imagesController.listImages);
 

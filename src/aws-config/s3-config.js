@@ -1,4 +1,4 @@
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client } = require('@aws-sdk/client-s3');
 
 exports.s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -9,6 +9,7 @@ exports.s3Client = new S3Client({
 });
 
 exports.s3BaseParams = {
+  Region: process.env.AWS_REGION,
   Bucket: process.env.BUCKET_NAME,
 };
 
@@ -23,11 +24,3 @@ exports.getImageUrl = (movieId, imageName) =>
 
 exports.getResizedImageUrl = (movieId, imageName) =>
   `https://${process.env.BUCKET_NAME}.s3.amazonaws.com/${process.env.RESIZED_IMAGE_PREFIX}/${movieId}/${imageName}`;
-
-exports.createSignedUrls = (imageKey) => {
-  const command = new GetObjectCommand({
-    ...this.s3BaseParams,
-    Key: imageKey,
-  });
-  return getSignedUrl(this.s3Client, command, { expiresIn: 60 * 60 });
-};
