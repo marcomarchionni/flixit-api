@@ -32,6 +32,8 @@ const movieSchema = mongoose.Schema({
   posterUrl: String,
   imageUrls: [String],
   resizedImageUrls: [String],
+  imageKeys: [String],
+  resizedImageKeys: [String],
   featured: Boolean,
 });
 

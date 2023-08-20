@@ -6,6 +6,7 @@
 const NoMoviesWithDirectorError = require('../error-handling/errors/no-movie-with-director-error');
 const NoMoviesWithGenreError = require('../error-handling/errors/no-movie-with-genre-error');
 const NoMovieWithTitleError = require('../error-handling/errors/no-movie-with-title-error');
+const NoMovieWithIdError = require('../error-handling/errors/no-movie-with-id-error');
 const { Movies } = require('../models/models');
 const { isEmptyArray } = require('../utils/utils');
 
@@ -17,7 +18,11 @@ const { isEmptyArray } = require('../utils/utils');
  */
 exports.findMovies = (req, res, next) => {
   Movies.find()
-    .then((movies) => res.json(movies))
+    .select('title director genre stars year posterUrl')
+    .then((movies) => {
+      req.movies = movies;
+      next();
+    })
     .catch(next);
 };
 
@@ -35,6 +40,26 @@ exports.findMovieByTitle = (req, res, next) => {
         throw new NoMovieWithTitleError(title);
       } else {
         res.json(movieFound);
+      }
+    })
+    .catch(next);
+};
+
+/**
+ * Finds a movie by id and returns the movie object.
+ * @param {object} req - The request object.
+ * @param {object} res - The response object.
+ * @param {function} next - The next middleware function.
+ */
+exports.findMovieById = (req, res, next) => {
+  const { movieId } = req.params;
+  Movies.findOne({ _id: movieId })
+    .then((movieFound) => {
+      if (!movieFound) {
+        throw new NoMovieWithIdError(movieId);
+      } else {
+        req.movie = movieFound;
+        next();
       }
     })
     .catch(next);

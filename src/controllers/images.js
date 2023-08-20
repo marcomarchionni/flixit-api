@@ -3,8 +3,7 @@ const {
   s3BaseParams,
   imagePrefix,
   getImageKey,
-  getImageUrl,
-  getResizedImageUrl,
+  getResizedImageKey,
 } = require('../aws-config/s3-config');
 const {
   ListObjectsV2Command,
@@ -70,6 +69,7 @@ exports.uploadMovieImage = async (req, res, next) => {
 
     // Put image in S3 bucket
     const imageKey = getImageKey(movieId, image.name);
+    console.log(imageKey);
     const putObjectParams = {
       ...s3BaseParams,
       Key: imageKey,
@@ -81,11 +81,11 @@ exports.uploadMovieImage = async (req, res, next) => {
     });
 
     // Add database image reference
-    const imageUrl = getImageUrl(movieId, image.name);
-    const resizedImageUrl = getResizedImageUrl(movieId, image.name);
+    const resizedImageKey = getResizedImageKey(movieId, image.name);
+    console.log(resizedImageKey);
     const updatedMovie = await Movies.findByIdAndUpdate(
       movieId,
-      { $push: { imageUrls: imageUrl, resizedImageUrls: resizedImageUrl } },
+      { $push: { imageKeys: imageKey, resizedImageKeys: resizedImageKey } },
       { new: true }
     );
 

@@ -11,6 +11,8 @@ const directorController = require('../controllers/director');
 const imagesController = require('../controllers/images');
 const validation = require('../middleware/validation');
 const authentication = require('../middleware/authentication');
+const signedUrlsGenerator = require('../middleware/signedUrlsGenerator');
+const response = require('../middleware/response');
 
 const router = express.Router();
 
@@ -26,11 +28,25 @@ router.get('/', (req, res) => {
 router.post('/login', authentication.localAuth);
 
 // GET list of all movies
-router.get('/movies', authentication.JWTAuth, movieController.findMovies);
+router.get(
+  '/movies',
+  authentication.JWTAuth,
+  movieController.findMovies,
+  response.sendMovies
+);
+
+// GET movies by id
+router.get(
+  '/movies/id/:movieId',
+  authentication.JWTAuth,
+  movieController.findMovieById,
+  signedUrlsGenerator.addImageUrls,
+  response.sendMovie
+);
 
 // GET movies by title
 router.get(
-  '/movies/:title',
+  '/movies/title/:title',
   authentication.JWTAuth,
   movieController.findMovieByTitle
 );
