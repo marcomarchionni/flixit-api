@@ -28,29 +28,6 @@ exports.listImages = (req, res, next) => {
     .catch(next);
 };
 
-exports.uploadImage = (req, res, next) => {
-  if (req.files) {
-    const image = req.files.image;
-
-    const putObjectParams = {
-      ...s3BaseParams,
-      Key: imagePrefix + image.name,
-      Body: image.data, // The file buffer
-    };
-
-    const putObjectCmd = new PutObjectCommand(putObjectParams);
-
-    s3Client
-      .send(putObjectCmd)
-      .then((response) => res.json(response))
-      .catch((err) => {
-        next(new S3Error(err));
-      });
-  } else {
-    next(new NoFileToUploadError());
-  }
-};
-
 exports.uploadMovieImage = async (req, res, next) => {
   try {
     // Check if the image file exists
@@ -93,28 +70,5 @@ exports.uploadMovieImage = async (req, res, next) => {
     res.json(updatedMovie);
   } catch (err) {
     next(err);
-  }
-};
-
-exports.retrieveImage = (req, res, next) => {
-  const fileName = req.params.fileName;
-  if (fileName) {
-    const mimeType = mime.getType(fileName) || 'application/octet-stream';
-    const getObjectParams = {
-      ...s3BaseParams,
-      Key: fileName,
-    };
-    const getObjectCmd = new GetObjectCommand(getObjectParams);
-    s3Client
-      .send(getObjectCmd)
-      .then((s3Response) => {
-        res.set('Content-Type', mimeType);
-        s3Response.Body.pipe(res);
-      })
-      .catch((err) => {
-        next(new S3Error(err));
-      });
-  } else {
-    next(new NoFilenameError());
   }
 };

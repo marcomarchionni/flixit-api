@@ -13,6 +13,7 @@ const validation = require('../middleware/validation');
 const authentication = require('../middleware/authentication');
 const signedUrlsGenerator = require('../middleware/signedUrlsGenerator');
 const response = require('../middleware/response');
+const adminAuth = require('../middleware/admin-authentication');
 
 const router = express.Router();
 
@@ -118,15 +119,13 @@ router.delete(
 );
 
 // LIST images from S3 bucket
-router.get('/images', imagesController.listImages);
-
-// UPLOAD image to S3 bucket
-router.post('/images', imagesController.uploadImage);
+router.get('/images', adminAuth.localAuth, imagesController.listImages);
 
 // UPLOAD movie image to S3 bucket
-router.post('/images/:movieId', imagesController.uploadMovieImage);
-
-// RETRIEVE image from S3 bucket
-router.get('/images/:fileName', imagesController.retrieveImage);
+router.post(
+  '/images/:movieId',
+  adminAuth.localAuth,
+  imagesController.uploadMovieImage
+);
 
 module.exports = router;
