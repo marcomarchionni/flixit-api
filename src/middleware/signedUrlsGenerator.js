@@ -22,7 +22,6 @@ exports.addImageUrls = async (req, res, next) => {
 };
 
 const createSignedUrl = async (key) => {
-  console.log(s3BaseParams);
   const getCommand = new GetObjectCommand({
     ...s3BaseParams,
     Key: key,
