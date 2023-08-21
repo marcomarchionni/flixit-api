@@ -11,6 +11,8 @@ passport.use(
       passwordField: 'password',
     },
     (username, password, callback) => {
+      console.log(process.env.ADMIN_USERNAME);
+      console.log(process.env.ADMIN_PASSWORD);
       if (
         username === process.env.ADMIN_USERNAME &&
         password === process.env.ADMIN_PASSWORD

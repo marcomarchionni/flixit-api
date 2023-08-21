@@ -77,3 +77,6 @@ stylelint.config.js
 
 # prettier config
 # prettier.config.js
+
+# Pm2
+ecosystem.config.js
